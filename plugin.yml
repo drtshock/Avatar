@@ -1,7 +1,7 @@
 name: AvatarPvP
 author: drtshock
 main: me.shock.avatarpvp.Main
-version: ${project.version}
+version: 1.0
 commands:
   bind:
     description: Clear binds with /bind clear

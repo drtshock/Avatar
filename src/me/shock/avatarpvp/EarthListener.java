@@ -92,17 +92,12 @@ public class EarthListener implements Listener {
 								// Can use it again.
 								else 
 								{
-									Block clickedBlock = event
-											.getClickedBlock();
-									Location loc = clickedBlock.getLocation()
-											.add(0, 1, 0);
-									loc.getWorld().spawnEntity(loc,
-											EntityType.IRON_GOLEM);
+									Block clickedBlock = event.getClickedBlock();
+									Location loc = clickedBlock.getLocation().add(0, 1, 0);
+									loc.getWorld().spawnEntity(loc, EntityType.IRON_GOLEM);
 									golem.remove(player.getName());
-									golem.put(player.getName(),
-											System.currentTimeMillis());
-									player.sendMessage(apvp
-											+ "Spawned an iron golem to protect you.");
+									golem.put(player.getName(),System.currentTimeMillis());
+									player.sendMessage(apvp + "Spawned an iron golem to protect you.");
 								}
 							}
 						} 
@@ -153,15 +148,20 @@ public class EarthListener implements Listener {
 							// Used it too recently.
 							if (fortifycool > diff) 
 							{
-								player.sendMessage(apvp + "You must wait "
-										+ ChatColor.RED + (fortifycool - diff)
-										+ ChatColor.WHITE
-										+ " seconds before using this again.");
+								player.sendMessage(apvp + "You must wait " + ChatColor.RED + (fortifycool - diff) + ChatColor.WHITE + " seconds before using this again.");
 							}
-							// Can use the ability again.
+							else
+							{
+								// Can use it.
+							}
 						}
-						// Everything must be above this.
+						else
+						{
+							// allow them to use it for the first time.
+						}
 					}
+					player.sendMessage(apvp + "You can't use that ability!");
+					return;
 				}
 			}
 		}
