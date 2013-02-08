@@ -3,8 +3,10 @@ package me.shock.avatarpvp;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -17,6 +19,7 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 public class EarthListener implements Listener {
 
@@ -152,12 +155,16 @@ public class EarthListener implements Listener {
 							}
 							else
 							{
-								// Can use it.
+								fortify(player);
+								fortify.put(player.getName(), System.currentTimeMillis());
+								player.sendMessage(apvp + "Created a fortification around you!");
 							}
 						}
 						else
 						{
-							// allow them to use it for the first time.
+							fortify(player);
+							fortify.put(player.getName(), System.currentTimeMillis());
+							player.sendMessage(apvp + "Created a fortification around you!");
 						}
 					}
 					player.sendMessage(apvp + "You can't use that ability!");
@@ -167,50 +174,78 @@ public class EarthListener implements Listener {
 		}
 	}
 
-					/**
-					 * Get the iron golem spawned then make it so it doesn't attack anyone else.
-					 */
+	/**
+	 * Get the iron golem spawned then make it so it doesn't attack anyone else.
+	 */
 
-					@EventHandler
-					public void onGolemTarget(EntityTargetLivingEntityEvent event) {
-						EntityType type = event.getEntityType();
-						if (type == EntityType.IRON_GOLEM) {
-							LivingEntity entityTarget = event.getTarget();
-							if (entityTarget instanceof Player) {
-								Player player = (Player) entityTarget;
-								if (player.hasPermission("avatarpvp.earth")) {
-									event.setCancelled(true);
-								}
-							}
-							return;
-						}
-						return;
-					}
+	@EventHandler
+	public void onGolemTarget(EntityTargetLivingEntityEvent event) {
+		EntityType type = event.getEntityType();
+		if (type == EntityType.IRON_GOLEM) {
+			LivingEntity entityTarget = event.getTarget();
+			if (entityTarget instanceof Player) {
+				Player player = (Player) entityTarget;
+				if (player.hasPermission("avatarpvp.earth")) {
+					event.setCancelled(true);
+				}
+			}
+			return;
+		}
+		return;
+	}
 
-					/**
-					 * Cancel damage if a player has fortify on.
-					 * @param event
-					 */
-					@EventHandler
-					public void onDamage(EntityDamageEvent event)
-					{
-						if(event.getEntity() instanceof Player)
-						{
-							Player player = (Player) event.getEntity();
-							if(noDamage.containsKey(player.getName()))
-							{
-								event.setCancelled(true);
-							}
-						}
-					}
+	/**
+	 * Cancel damage if a player has fortify on.
+	 * @param event
+	 */
+	@EventHandler
+	public void onDamage(EntityDamageEvent event)
+	{
+		if(event.getEntity() instanceof Player)
+		{
+			Player player = (Player) event.getEntity();
+			if(noDamage.containsKey(player.getName()))
+			{
+				event.setCancelled(true);
+			}
+		}
+	}
 
-					public boolean checkBlocked(Player player)
-					{
-						if(plugin.blocked.contains(player.getName()))
-						{
-							player.sendMessage(ChatColor.RED + "You are blocked from using any abilities!");
-							return true;
+	public boolean checkBlocked(Player player)
+	{
+		if(plugin.blocked.contains(player.getName()))
+		{
+			player.sendMessage(ChatColor.RED + "You are blocked from using any abilities!");
+			return true;
+		}
+		return false;
+	}
+
+	public void fortify(final Player player)
+	{
+		for(int x = 100; x < 150; x++) {
+			for(int y = 100; y < 105; y++) {
+				for(int z = 100; z < 105; z++) {
+					Location loc = new Location(player.getWorld(), x , y, z);
+					loc.getBlock().setType(Material.OBSIDIAN);
+				}
+			}
+		}
+		// End of for statements
+		Bukkit.getServer().getScheduler().runTaskLater((Plugin) this, new Runnable(){
+
+			@Override
+			public void run() {
+				for(int x = 100; x < 150; x++) {
+					for(int y = 100; y < 105; y++) {
+						for(int z = 100; z < 105; z++) {
+							Location loc = new Location(player.getWorld(), x , y, z);
+							loc.getBlock().setType(Material.AIR);
 						}
-						return false;
 					}
 				}
+			}
+
+		}, 100L);
+	}
+}
